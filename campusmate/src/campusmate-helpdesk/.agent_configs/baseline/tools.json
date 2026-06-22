@@ -1,0 +1,57 @@
+[
+  {
+    "type": "function",
+    "function": {
+      "name": "get_class_schedule",
+      "description": "Look up the class and lab schedule for a department on a given weekday.",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "dept": {
+            "type": "string",
+            "description": "Department code, e.g. 'CSE'."
+          },
+          "day": {
+            "type": "string",
+            "description": "Weekday name, e.g. 'monday'."
+          }
+        },
+        "required": ["dept", "day"]
+      }
+    }
+  },
+  {
+    "type": "function",
+    "function": {
+      "name": "search_library_book",
+      "description": "Check whether a library book is available and where to find it.",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string",
+            "description": "Book title to search for."
+          }
+        },
+        "required": ["title"]
+      }
+    }
+  },
+  {
+    "type": "function",
+    "function": {
+      "name": "find_faculty",
+      "description": "Find the faculty member for a subject, with cabin location and office hours.",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "subject": {
+            "type": "string",
+            "description": "Subject name, e.g. 'DBMS'."
+          }
+        },
+        "required": ["subject"]
+      }
+    }
+  }
+]

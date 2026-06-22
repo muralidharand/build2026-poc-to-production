@@ -1,0 +1,31 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/microsoft/AgentSchema/refs/heads/main/schemas/v1.0/ContainerAgent.yaml
+
+kind: hosted
+name: campusmate-helpdesk
+description: |
+  Voice-enabled campus helpdesk assistant for students at Kovai Institute of Technology (KIT). Built on the Microsoft Agent Framework (MAF) with FoundryChatClient, an optional MCP Toolbox connection, and local function tools that return sample data so the agent runs out of the box.
+metadata:
+  tags:
+    - Campus Helpdesk
+    - Voice
+    - Responses Protocol
+    - Agent Framework
+protocols:
+  - protocol: responses
+    version: 1.0.0
+resources:
+  cpu: "1"
+  memory: 2Gi
+environment_variables:
+  - name: MODEL_DEPLOYMENT_NAME
+    value: gpt-5
+  - name: ENABLE_INSTRUMENTATION
+    value: "true"
+  - name: ENABLE_SENSITIVE_DATA
+    value: "true"
+
+  # ── Optional integrations (left unset → the agent uses built-in sample data) ──
+  # Foundry Toolbox: a single MCP endpoint that can supply AI Search, Web Search,
+  # and Code Interpreter. Set to your project's toolbox MCP URL to enable.
+  # - name: TOOLBOX_ENDPOINT
+  #   value: https://<account>.services.ai.azure.com/api/projects/<project>/toolboxes/<toolbox>/mcp?api-version=v1

@@ -1,0 +1,23 @@
+{
+  "_comment": "Seed file used when the live Foundry Memory Store can't be reached (e.g., the project is not configured for the memory-store preview). Loaded by src/field-ops-agent/procedural_memory.py when PROCEDURAL_MEMORY_MODE is 'seed' or 'hybrid' and the live path fails. These two items illustrate procedural memory: patterns the agent has learned from past technician conversations.",
+  "items": [
+    {
+      "id": "proc-seed-clarifying-last-service",
+      "kind": "procedural",
+      "scope": "user-procedural",
+      "content": {
+        "applicable_to": "When a user asks for a site's \"last service date\" and the service-history system includes both internal and third-party/vendor visits.",
+        "instruction": "Ask a quick clarifying question (internal company vs third-party vs any) before querying/answering; if time-critical, present both the most recent internal and most recent third-party entries, clearly labeled."
+      }
+    },
+    {
+      "id": "proc-seed-sop-override",
+      "kind": "procedural",
+      "scope": "user-procedural",
+      "content": {
+        "applicable_to": "When a user corrects a generic SOP with site-specific overrides during a time-critical procedure request.",
+        "instruction": "Immediately restate the full procedure with the user-provided overrides integrated, and confirm the three key deviations up front (notification channel, test direction, and logging system) before listing the remaining generic steps."
+      }
+    }
+  ]
+}

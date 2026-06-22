@@ -1,0 +1,13 @@
+name: campusmate-helpdesk
+agent:
+    name: campusmate-helpdesk
+    kind: hosted
+    config: .agent_configs/baseline/metadata.yaml
+dataset_file: eval/campusmate_golden.jsonl
+evaluators:
+    - name: campusmate-helpdesk
+      version: "5"
+      local_uri: evaluators/campusmate-helpdesk/rubric_dimensions.json
+options:
+    eval_model: gpt-5
+max_samples: 5

@@ -1,0 +1,28 @@
+name: nodues-coordinator
+displayName: "NoDues Coordinator"
+description: >
+  Long-running no-dues coordinator for Kovai Institute of Technology (KIT).
+  Checks student dues across departments, gates the final certificate behind
+  human-in-the-loop officer approval, and persists the dossier for audit.
+metadata:
+  tags:
+    - Campus No-Dues
+    - Long-Running Agent
+    - Responses Protocol
+    - Activity Protocol
+    - Teams
+template:
+  name: nodues-coordinator
+  kind: hosted
+  protocols:
+    - protocol: responses
+      version: 1.0.0
+    - protocol: activity_protocol
+      version: 1.0.0
+  environment_variables:
+    - name: AZURE_AI_MODEL_DEPLOYMENT_NAME
+      value: "{{AZURE_AI_MODEL_DEPLOYMENT_NAME}}"
+resources:
+  - kind: model
+    id: gpt-5
+    name: AZURE_AI_MODEL_DEPLOYMENT_NAME
