@@ -1,0 +1,25 @@
+name: field-ops-agent
+displayName: "Field Operations Agent"
+description: >
+  Voice-enabled field technician assistant for data center operations.
+  Built on the Microsoft Agent Framework with FoundryChatClient, an optional
+  MCP Toolbox connection, and local function tools that return sample data.
+metadata:
+  tags:
+    - Field Operations
+    - Voice
+    - Responses Protocol
+    - Agent Framework
+template:
+  name: field-ops-agent
+  kind: hosted
+  protocols:
+    - protocol: responses
+      version: 1.0.0
+  environment_variables:
+    - name: MODEL_DEPLOYMENT_NAME
+      value: "gpt-5"
+resources:
+  - kind: model
+    id: gpt-5
+    name: MODEL_DEPLOYMENT_NAME

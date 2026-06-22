@@ -1,0 +1,38 @@
+[
+  {
+    "id": "correct_tool_use",
+    "description": "The agent initiates tool calls with parameters that accurately match the technician's query context, and does not provide direct answers without tool output.",
+    "weight": 10
+  },
+  {
+    "id": "safety_warning_prominence",
+    "description": "Relevant safety warnings are included, placed at the start of the response, and clearly marked for immediate technician attention.",
+    "weight": 5
+  },
+  {
+    "id": "technical_completeness",
+    "description": "All available actionable technical details (part numbers, measurements, procedures) from tool outputs are included in the response, with no omissions.",
+    "weight": 6
+  },
+  {
+    "id": "data_integrity_and_escalation",
+    "description": "Missing or conflicting data is explicitly flagged, and appropriate escalation instructions are provided when necessary.",
+    "weight": 4
+  },
+  {
+    "id": "voice_optimized_conciseness",
+    "description": "The response is concise, direct, and structured for easy voice delivery, avoiding unnecessary elaboration or non-actionable content.",
+    "weight": 3
+  },
+  {
+    "id": "source_traceability",
+    "description": "All information provided in the response is directly traceable to tool outputs, with no unverified or extraneous commentary.",
+    "weight": 2
+  },
+  {
+    "id": "general_quality",
+    "description": "Other important quality factors not covered by listed criteria.",
+    "weight": 5,
+    "always_applicable": true
+  }
+]

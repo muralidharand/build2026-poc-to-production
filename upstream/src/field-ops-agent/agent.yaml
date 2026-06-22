@@ -1,0 +1,50 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/microsoft/AgentSchema/refs/heads/main/schemas/v1.0/ContainerAgent.yaml
+
+kind: hosted
+name: field-ops-agent
+description: |
+  Voice-enabled field technician assistant for data center operations. Built on the Microsoft Agent Framework (MAF) with FoundryChatClient, an optional MCP Toolbox connection, and local function tools that return sample data so the agent runs out of the box.
+metadata:
+  tags:
+    - Field Operations
+    - Voice
+    - Responses Protocol
+    - Agent Framework
+protocols:
+  - protocol: responses
+    version: 1.0.0
+resources:
+  cpu: "1"
+  memory: 2Gi
+environment_variables:
+  - name: MODEL_DEPLOYMENT_NAME
+    value: gpt-5
+  # Procedural memory — Foundry Memory Store name and load mode.
+  # MODE=hybrid tries the live Memory Store first and falls back to the bundled
+  # procedural_memory_seed.json on any error, so the demo works without setup.
+  # Set MODE=live once your project is configured for memory-store extraction.
+  - name: PROCEDURAL_MEMORY_MODE
+    value: hybrid
+  - name: ENABLE_INSTRUMENTATION
+    value: "true"
+  - name: ENABLE_SENSITIVE_DATA
+    value: "true"
+
+  # ── Optional integrations (left unset → the agent uses built-in sample data) ──
+  # Foundry Toolbox: a single MCP endpoint that can supply AI Search, Web Search,
+  # and Code Interpreter. Set to your project's toolbox MCP URL to enable.
+  # - name: TOOLBOX_ENDPOINT
+  #   value: https://<account>.services.ai.azure.com/api/projects/<project>/toolboxes/<toolbox>/mcp?api-version=v1
+  #
+  # Microsoft Fabric data agent: surfaces site-reliability telemetry from OneLake.
+  # Provide your own Fabric workspace + data agent (artifact) IDs to enable.
+  # - name: FABRIC_DATA_AGENT_CONNECTION_NAME
+  #   value: <fabric-connection-name>
+  # - name: FABRIC_WORKSPACE_ID
+  #   value: <your-fabric-workspace-id>
+  # - name: FABRIC_ARTIFACT_ID
+  #   value: <your-fabric-data-agent-id>
+  #
+  # Procedural memory store name (defaults to the bundled seed when MODE=hybrid).
+  # - name: PROCEDURAL_MEMORY_STORE_NAME
+  #   value: <your-memory-store-name>

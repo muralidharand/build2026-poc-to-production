@@ -1,0 +1,43 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/Azure/azure-dev/main/schemas/v1.0/azure.yaml.json
+
+requiredVersions:
+    extensions:
+        azure.ai.agents: '>=0.1.0-preview'
+name: field-and-network-ops-agents
+services:
+    fibey-coordinator:
+        project: src/fibey-coordinator
+        host: azure.ai.agent
+        language: docker
+        docker:
+            remoteBuild: true
+        config:
+            container:
+                resources:
+                    cpu: "1"
+                    memory: 2Gi
+            deployments:
+                - model:
+                    format: OpenAI
+                    name: gpt-5
+                    version: "2025-08-07"
+                  name: gpt-5
+                  sku:
+                    capacity: 50
+                    name: GlobalStandard
+            startupCommand: python main.py
+    field-ops-agent:
+        project: src/field-ops-agent
+        host: azure.ai.agent
+        language: docker
+        docker:
+            remoteBuild: true
+        config:
+            container:
+                resources:
+                    cpu: "1"
+                    memory: 2Gi
+            startupCommand: python main.py
+infra:
+    provider: bicep
+    path: ./infra

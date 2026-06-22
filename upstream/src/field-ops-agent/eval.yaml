@@ -1,0 +1,13 @@
+name: field-ops-agent
+agent:
+    name: field-ops-agent
+    kind: hosted
+    config: .agent_configs/baseline/metadata.yaml
+dataset_file: eval/field_ops_golden.jsonl
+evaluators:
+    - name: field-ops-agent
+      version: "5"
+      local_uri: evaluators/field-ops-agent/rubric_dimensions.json
+options:
+    eval_model: gpt-5
+max_samples: 5

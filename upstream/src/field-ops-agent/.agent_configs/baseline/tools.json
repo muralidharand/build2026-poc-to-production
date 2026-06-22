@@ -1,0 +1,122 @@
+[
+  {
+    "type": "function",
+    "function": {
+      "name": "search_site_specs",
+      "description": "Search site specifications and infrastructure details for a data center site.",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "query": {
+            "type": "string",
+            "description": "What to look up (e.g., 'fiber termination spec', 'power capacity')."
+          },
+          "site": {
+            "type": "string",
+            "description": "Site name filter (e.g., 'Quincy North B-side')."
+          }
+        },
+        "required": ["query"]
+      }
+    }
+  },
+  {
+    "type": "function",
+    "function": {
+      "name": "search_work_iq",
+      "description": "Search WorkIQ for active work orders, maintenance tasks, and assignments.",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "query": {
+            "type": "string",
+            "description": "Free-text search across work orders."
+          },
+          "status": {
+            "type": "string",
+            "description": "Filter by status (e.g., 'Assigned', 'In Progress', 'Scheduled')."
+          },
+          "priority": {
+            "type": "string",
+            "description": "Filter by priority (e.g., 'P1', 'P2', 'P3')."
+          }
+        }
+      }
+    }
+  },
+  {
+    "type": "function",
+    "function": {
+      "name": "get_repair_procedure",
+      "description": "Look up step-by-step repair procedures for data center equipment.",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "equipment_type": {
+            "type": "string",
+            "description": "Type of equipment (e.g., 'QSFP-DD transceiver', 'fiber splice')."
+          },
+          "issue": {
+            "type": "string",
+            "description": "Specific issue description for context."
+          }
+        },
+        "required": ["equipment_type"]
+      }
+    }
+  },
+  {
+    "type": "function",
+    "function": {
+      "name": "analyze_document",
+      "description": "Analyze a technical document or specification sheet using Document Understanding.",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "document_url": {
+            "type": "string",
+            "description": "URL or path to the document to analyze."
+          },
+          "analysis_type": {
+            "type": "string",
+            "description": "Type of analysis - 'summary', 'extract_specs', 'compliance_check'."
+          }
+        },
+        "required": ["document_url"]
+      }
+    }
+  },
+  {
+    "type": "function",
+    "function": {
+      "name": "query_site_reliability",
+      "description": "Ask the Fabric data agent (Fabric IQ) for site reliability information. Use this for questions about current site health, telemetry trends, open or recent incidents, daily availability/SLO performance, and which subcontractor was dispatched for an incident. The data agent has access to per-minute optical / power / thermal / latency telemetry plus the incident log and daily SLO summary for every data center fleet site (Quincy North, East US DC-4/7/9, Singapore South/West, Sweden Central DC-1/2, Spain Central DC-1).",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "question": {
+            "type": "string",
+            "description": "The natural-language question to forward to the Fabric data agent. Be specific about the site name when known (e.g., 'How is Quincy North performing in the last hour?')."
+          }
+        },
+        "required": ["question"]
+      }
+    }
+  },
+  {
+    "type": "function",
+    "function": {
+      "name": "recall_learned_procedures",
+      "description": "Recall procedural memories you have learned from past field-tech conversations. Call this when a user asks how to do something and you want to make sure you're applying any site-specific overrides or clarifying-question patterns you've learned. The procedures are also prepended to your system prompt at startup as 'Learned procedures' — this tool gives you on-demand access for explicit inspection (e.g., when a user asks 'what have you learned?'). Each procedure has applicable_to (when it fires) and instruction (what to do).",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "situation": {
+            "type": "string",
+            "description": "Optional free-text description of the situation."
+          }
+        }
+      }
+    }
+  }
+]
