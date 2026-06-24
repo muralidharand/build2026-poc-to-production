@@ -23,7 +23,7 @@ services:
                     version: "2025-08-07"
                   name: gpt-5
                   sku:
-                    capacity: 50
+                    capacity: 10
                     name: GlobalStandard
             startupCommand: python main.py
     campusmate-helpdesk:
