@@ -2,7 +2,7 @@ agent-framework==1.6.0
 agent-framework-foundry==1.0.1
 azure-ai-agentserver-core[tracing]==2.0.0b3
 azure-ai-agentserver-responses==1.0.0b5
-./wheels/azure_ai_agentserver_optimization-1.0.0b1.dev1-py3-none-any.whl
+azure-ai-agentserver-optimization==1.0.0b1.dev1
 azure-identity>=1.19.0
 python-dotenv>=1.0.0
 httpx>=0.27.0
