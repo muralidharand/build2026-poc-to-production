@@ -67,52 +67,79 @@ NODUES_DIR = HOME_DIR / "nodues"
 
 # ── Sample Student Data ────────────────────────────────────────────────────────
 #
-# DEMO POINT: one deliberate pending hostel due so the demo has a real obstacle
-# to resolve on stage. The coordinator will ask for officer approval before
-# issuing the certificate.
+# DEMO POINT: three students with different due scenarios:
+#   22CSE114 Arjun   — hostel ₹1,500 pending  → triggers the HitL approval gate
+#   22ECE089 Priya   — library ₹200 + lab ₹500 → multiple department clearances
+#   21MECH045 Kiran  — all dues zero           → fast happy-path certificate
 
-STUDENT = {
-    "id": "22CSE114",
-    "name": "Arjun",
-    "dept": "CSE",
-    "semester": 6,
-    "dues": {"library": 0, "lab": 0, "hostel": 1500, "fees": 0},  # rupees pending
+STUDENTS: dict[str, dict] = {
+    "22CSE114": {
+        "id": "22CSE114",
+        "name": "Arjun",
+        "dept": "CSE",
+        "semester": 6,
+        "dues": {"library": 0, "lab": 0, "hostel": 1500, "fees": 0},
+    },
+    "22ECE089": {
+        "id": "22ECE089",
+        "name": "Priya",
+        "dept": "ECE",
+        "semester": 6,
+        "dues": {"library": 200, "lab": 500, "hostel": 0, "fees": 0},
+    },
+    "21MECH045": {
+        "id": "21MECH045",
+        "name": "Kiran",
+        "dept": "MECH",
+        "semester": 8,
+        "dues": {"library": 0, "lab": 0, "hostel": 0, "fees": 0},
+    },
 }
 
 
 # ── Tool Implementations ─────────────────────────────────────────────────────
 
 
-def check_dues(department: str = "") -> str:
-    """Check pending dues (in rupees) for one department (library|lab|hostel|fees),
-    or all departments if none is given.
+def check_dues(student_id: str = "22CSE114", department: str = "") -> str:
+    """Check pending dues (in rupees) for a student.
 
     Args:
+        student_id: Student roll number (e.g. '22CSE114'). Defaults to 22CSE114.
         department: Department name to check ('library', 'lab', 'hostel', 'fees').
                     Leave empty to check all departments.
     """
+    student = STUDENTS.get(student_id.upper())
+    if not student:
+        return json.dumps({"error": f"Student {student_id} not found. Valid IDs: {list(STUDENTS)}"})
     if department:
-        amt = STUDENT["dues"].get(department.lower(), 0)
-        return json.dumps({"department": department, "pending_inr": amt, "cleared": amt == 0})
+        amt = student["dues"].get(department.lower(), 0)
+        return json.dumps({"student": student["name"], "department": department,
+                           "pending_inr": amt, "cleared": amt == 0})
     return json.dumps({
-        "student": STUDENT["name"],
-        "student_id": STUDENT["id"],
-        "dues": STUDENT["dues"],
-        "all_cleared": all(v == 0 for v in STUDENT["dues"].values()),
+        "student": student["name"],
+        "student_id": student["id"],
+        "dept": student["dept"],
+        "semester": student["semester"],
+        "dues": student["dues"],
+        "all_cleared": all(v == 0 for v in student["dues"].values()),
     })
 
 
-def clear_due(department: str) -> str:
-    """Mark a department's due as paid/cleared (simulates the department responding).
+def clear_due(student_id: str, department: str) -> str:
+    """Mark a department's due as paid/cleared (simulates the department confirming payment).
 
     Args:
+        student_id: Student roll number (e.g. '22CSE114').
         department: Department whose due to clear ('library', 'lab', 'hostel', 'fees').
     """
+    student = STUDENTS.get(student_id.upper())
+    if not student:
+        return json.dumps({"status": "error", "reason": f"Student {student_id} not found"})
     dept_key = department.lower()
-    if dept_key not in STUDENT["dues"]:
+    if dept_key not in student["dues"]:
         return json.dumps({"status": "error", "reason": f"Unknown department: {department}"})
-    STUDENT["dues"][dept_key] = 0
-    return json.dumps({"department": department, "status": "cleared"})
+    student["dues"][dept_key] = 0
+    return json.dumps({"student": student["name"], "department": department, "status": "cleared"})
 
 
 def request_approval(
@@ -176,31 +203,35 @@ def request_approval(
     return json.dumps(result, indent=2)
 
 
-def issue_no_dues_certificate(officer_approved: bool = False) -> str:
+def issue_no_dues_certificate(student_id: str = "22CSE114", officer_approved: bool = False) -> str:
     """Issue the final No-Dues certificate. Requires officer_approved=True
     (human-in-the-loop) and that NO dues remain. Refuses otherwise.
 
     Args:
+        student_id: Student roll number (e.g. '22CSE114').
         officer_approved: Set to True only after request_approval has been granted.
     """
     if not officer_approved:
         return json.dumps({"status": "blocked", "reason": "officer approval required"})
-    if any(v > 0 for v in STUDENT["dues"].values()):
+    student = STUDENTS.get(student_id.upper())
+    if not student:
+        return json.dumps({"status": "error", "reason": f"Student {student_id} not found"})
+    if any(v > 0 for v in student["dues"].values()):
         return json.dumps({
             "status": "blocked",
             "reason": "dues still pending",
-            "dues": STUDENT["dues"],
+            "dues": student["dues"],
         })
-    cert_id = f"NOC-{STUDENT['id']}-{datetime.now(timezone.utc).strftime('%Y%m%d')}"
+    cert_id = f"NOC-{student['id']}-{datetime.now(timezone.utc).strftime('%Y%m%d')}"
     return json.dumps({
         "status": "issued",
         "certificate_id": cert_id,
-        "student": STUDENT["name"],
-        "student_id": STUDENT["id"],
-        "dept": STUDENT["dept"],
-        "semester": STUDENT["semester"],
+        "student": student["name"],
+        "student_id": student["id"],
+        "dept": student["dept"],
+        "semester": student["semester"],
         "issued_at": datetime.now(timezone.utc).isoformat(),
-        "message": f"No-Dues Certificate {cert_id} issued successfully for {STUDENT['name']}.",
+        "message": f"No-Dues Certificate {cert_id} issued successfully for {student['name']}.",
     })
 
 
@@ -244,19 +275,25 @@ Your job is to help students obtain a No-Dues certificate before graduation or s
 You check each department's pending dues, facilitate clearance, and issue the final certificate
 only after all dues are cleared AND an officer has approved the request.
 
+Registered students (use these IDs with all tools):
+  - 22CSE114 — Arjun (CSE Sem 6) — hostel due pending
+  - 22ECE089 — Priya (ECE Sem 6) — library + lab dues pending
+  - 21MECH045 — Kiran (MECH Sem 8) — all dues cleared, ready for certificate
+
 When a student asks for a no-dues certificate:
-1. Call check_dues() (no arguments) to get the full dues picture for the student.
-2. Report which departments have pending dues and the amounts in rupees.
-3. If any dues remain, explain which department needs to be cleared first.
-4. For the demo: call request_approval() to trigger the human-in-the-loop gate.
-5. Only call issue_no_dues_certificate(officer_approved=True) AFTER the officer approves.
-6. Save the final dossier with save_request() for the audit trail.
+1. Ask for their student ID if not provided.
+2. Call check_dues(student_id) to get the full dues picture.
+3. Report which departments have pending dues and the amounts in rupees.
+4. If dues remain, guide the student to the relevant department counter.
+5. Call request_approval() to trigger the human-in-the-loop gate before issuing.
+6. Only call issue_no_dues_certificate(student_id, officer_approved=True) AFTER the officer approves.
+7. Save the final dossier with save_request() for the audit trail.
 
 CRITICAL RULE: Never call issue_no_dues_certificate without first calling request_approval.
 IMPORTANT: If the student or officer says "Approved", "Proceed", or confirms a pending approval,
 do NOT call request_approval again. The approval has already been granted.
-If the officer message includes confirmed due amounts or states dues are cleared, first call
-clear_due() for each cleared department, then call issue_no_dues_certificate(officer_approved=True).
+If the officer confirms specific dues are cleared, first call clear_due(student_id, department)
+for each cleared department, then call issue_no_dues_certificate(student_id, officer_approved=True).
 Never call issue_no_dues_certificate while any dues remain unpaid in the system.
 
 When reporting dues:
