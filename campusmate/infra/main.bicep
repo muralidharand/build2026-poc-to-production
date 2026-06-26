@@ -1,6 +1,7 @@
-// CampusMate — Azure infrastructure
-// Uses standard, widely-available resource types only.
-// The Foundry project is connected separately via: azd ai agent init
+// CampusMate — supporting infrastructure only.
+// AI Foundry account, project, and model deployments are created via
+// the Foundry portal (ai.azure.com) to avoid preview-API instability.
+// This Bicep provisions: ACR, Storage, App Insights, Log Analytics.
 
 targetScope = 'resourceGroup'
 
@@ -10,13 +11,9 @@ param environmentName string
 @description('Azure region.')
 param location string = resourceGroup().location
 
-// ---------------------------------------------------------------------------
-// Variables
-// ---------------------------------------------------------------------------
 var abbrs         = loadJsonContent('./abbreviations.json')
 var resourceToken = toLower(uniqueString(subscription().id, environmentName, location))
 var tags          = { 'azd-env-name': environmentName }
-var acrPullRoleId = '7f951dda-4ed3-4680-a7ca-43fe172d538d'
 
 // ---------------------------------------------------------------------------
 // Log Analytics + App Insights
@@ -58,7 +55,7 @@ resource storageAccount 'Microsoft.Storage/storageAccounts@2023-05-01' = {
 }
 
 // ---------------------------------------------------------------------------
-// Container Registry (admin enabled for ACR Tasks remote build)
+// Container Registry (admin enabled — azd uses ACR Tasks for remote build)
 // ---------------------------------------------------------------------------
 resource containerRegistry 'Microsoft.ContainerRegistry/registries@2023-07-01' = {
   name: '${abbrs.containerRegistryRegistries}${resourceToken}'
@@ -69,47 +66,10 @@ resource containerRegistry 'Microsoft.ContainerRegistry/registries@2023-07-01' =
 }
 
 // ---------------------------------------------------------------------------
-// Azure OpenAI account (kind: OpenAI — standard, no feature flags needed)
-// gpt-5 GlobalStandard is available in eastus2.
-// ---------------------------------------------------------------------------
-resource openAiAccount 'Microsoft.CognitiveServices/accounts@2024-10-01' = {
-  name: '${abbrs.cognitiveServicesAccounts}${resourceToken}'
-  location: location
-  tags: tags
-  kind: 'AIServices'
-  identity: { type: 'SystemAssigned' }
-  sku: { name: 'S0' }
-  properties: {
-    customSubDomainName: '${abbrs.cognitiveServicesAccounts}${resourceToken}'
-    publicNetworkAccess: 'Enabled'
-    disableLocalAuth: false
-  }
-}
-
-// NOTE: gpt-5 deployment is created via CLI after provision (see README).
-// az cognitiveservices account deployment create ... --model-name gpt-5
-
-// ---------------------------------------------------------------------------
-// AcrPull for the OpenAI account managed identity
-// When connected to a Foundry project, the project pulls images via this identity.
-// ---------------------------------------------------------------------------
-resource acrPullForOpenAi 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
-  name: guid(containerRegistry.id, openAiAccount.id, acrPullRoleId)
-  scope: containerRegistry
-  properties: {
-    roleDefinitionId: subscriptionResourceId('Microsoft.Authorization/roleDefinitions', acrPullRoleId)
-    principalId: openAiAccount.identity.principalId
-    principalType: 'ServicePrincipal'
-  }
-}
-
-// ---------------------------------------------------------------------------
 // Outputs
 // ---------------------------------------------------------------------------
 output AZURE_RESOURCE_GROUP string = resourceGroup().name
 output AZURE_LOCATION string = location
-output AZURE_OPENAI_ACCOUNT_NAME string = openAiAccount.name
-output AZURE_OPENAI_ENDPOINT string = openAiAccount.properties.endpoint
 output AZURE_CONTAINER_REGISTRY_ENDPOINT string = containerRegistry.properties.loginServer
 output AZURE_CONTAINER_REGISTRY_NAME string = containerRegistry.name
 output APPLICATIONINSIGHTS_CONNECTION_STRING string = appInsights.properties.ConnectionString
