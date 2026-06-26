@@ -1,2 +1,4 @@
-campusmate/src/campusmate-helpdesk/__pycache__/
-campusmate/src/nodues-coordinator/__pycache__/
+__pycache__/
+*.pyc
+*.pyo
+.env
