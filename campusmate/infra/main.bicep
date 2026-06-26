@@ -148,7 +148,9 @@ output AZURE_AI_FOUNDRY_ACCOUNT_NAME string = foundryAccount.name
 output AZURE_AI_PROJECT_NAME string = foundryProject.name
 output AZURE_AI_PROJECT_ID string = foundryProject.id
 output AZURE_AI_SERVICES_ENDPOINT string = foundryAccount.properties.endpoint
-// FOUNDRY_PROJECT_ENDPOINT is what the azure.ai.agents azd extension requires
-output FOUNDRY_PROJECT_ENDPOINT string = '${foundryAccount.properties.endpoint}projects/${foundryProject.name}'
+// FOUNDRY_PROJECT_ENDPOINT is what the azure.ai.agents azd extension requires.
+// The project resource exposes its own endpoint (services.ai.azure.com domain)
+// which is different from the account's cognitiveservices.azure.com endpoint.
+output FOUNDRY_PROJECT_ENDPOINT string = foundryProject.properties.endpoint
 output AZURE_CONTAINER_REGISTRY_ENDPOINT string = containerRegistry.properties.loginServer
 output APPLICATIONINSIGHTS_CONNECTION_STRING string = appInsights.properties.ConnectionString
