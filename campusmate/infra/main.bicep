@@ -77,7 +77,7 @@ resource containerRegistry 'Microsoft.ContainerRegistry/registries@2023-07-01' =
 // Azure AI Foundry account (CognitiveServices AIServices)
 // allowProjectManagement: true is required to create child projects.
 // ---------------------------------------------------------------------------
-resource foundryAccount 'Microsoft.CognitiveServices/accounts@2024-10-01-preview' = {
+resource foundryAccount 'Microsoft.CognitiveServices/accounts@2025-06-01' = {
   name: '${abbrs.cognitiveServicesAccounts}${resourceToken}'
   location: location
   tags: tags
@@ -95,7 +95,7 @@ resource foundryAccount 'Microsoft.CognitiveServices/accounts@2024-10-01-preview
 // ---------------------------------------------------------------------------
 // gpt-5 model deployment (child of the Foundry account)
 // ---------------------------------------------------------------------------
-resource gpt5Deployment 'Microsoft.CognitiveServices/accounts/deployments@2024-10-01' = {
+resource gpt5Deployment 'Microsoft.CognitiveServices/accounts/deployments@2025-06-01' = {
   name: 'gpt-5'
   parent: foundryAccount
   sku: {
@@ -115,7 +115,7 @@ resource gpt5Deployment 'Microsoft.CognitiveServices/accounts/deployments@2024-1
 // Foundry Project (child of the Foundry account)
 // SystemAssigned identity is required — its principalId is used for AcrPull.
 // ---------------------------------------------------------------------------
-resource foundryProject 'Microsoft.CognitiveServices/accounts/projects@2024-10-01-preview' = {
+resource foundryProject 'Microsoft.CognitiveServices/accounts/projects@2025-04-01-preview' = {
   name: projectName
   parent: foundryAccount
   location: location
@@ -130,7 +130,7 @@ resource foundryProject 'Microsoft.CognitiveServices/accounts/projects@2024-10-0
 // Registers the Container Registry with the Foundry project so the hosted
 // agent infrastructure knows which registry to pull images from.
 // ---------------------------------------------------------------------------
-resource projectAcrConnection 'Microsoft.CognitiveServices/accounts/projects/connections@2024-10-01-preview' = {
+resource projectAcrConnection 'Microsoft.CognitiveServices/accounts/projects/connections@2025-04-01-preview' = {
   name: 'acr-connection'
   parent: foundryProject
   properties: {
