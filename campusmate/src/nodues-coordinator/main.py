@@ -461,4 +461,99 @@ import teams_bot
 teams_bot.configure(agent_getter=_get_agent, durable_manager=durable_manager)
 responses.add_route("/api/messages", teams_bot.handle_messages, methods=["POST"])
 
+
+# --- Admin endpoints (simulate payment system callbacks) ---------------------
+# POST /admin/clear-dues  — mark one or all dues as paid for a student
+# GET  /admin/dues        — read current dues state (use ?student_id=22CSE114)
+#
+# Usage (curl):
+#   Clear hostel only:
+#     curl -X POST http://<host>/admin/clear-dues \
+#          -H "Content-Type: application/json" \
+#          -d '{"student_id": "22CSE114", "department": "hostel"}'
+#
+#   Clear all dues at once:
+#     curl -X POST http://<host>/admin/clear-dues \
+#          -H "Content-Type: application/json" \
+#          -d '{"student_id": "22CSE114", "all": true}'
+#
+#   Check current dues:
+#     curl "http://<host>/admin/dues?student_id=22CSE114"
+
+from starlette.requests import Request as _StarletteRequest
+from starlette.responses import JSONResponse as _JSONResponse
+
+
+async def _admin_clear_dues(request: _StarletteRequest):
+    try:
+        body = await request.json()
+    except Exception:
+        return _JSONResponse({"error": "invalid JSON body"}, status_code=400)
+
+    student_id = str(body.get("student_id", "")).upper()
+    student = STUDENTS.get(student_id)
+    if not student:
+        return _JSONResponse(
+            {"error": f"student {student_id} not found", "valid_ids": list(STUDENTS)},
+            status_code=404,
+        )
+
+    clear_all = body.get("all", False)
+    department = str(body.get("department", "")).lower()
+
+    if clear_all:
+        cleared = list(student["dues"].keys())
+        for key in cleared:
+            student["dues"][key] = 0
+    elif department:
+        if department not in student["dues"]:
+            return _JSONResponse(
+                {"error": f"unknown department '{department}'",
+                 "valid_departments": list(student["dues"].keys())},
+                status_code=400,
+            )
+        student["dues"][department] = 0
+        cleared = [department]
+    else:
+        return _JSONResponse(
+            {"error": "provide 'department' (string) or 'all': true"},
+            status_code=400,
+        )
+
+    logger.info("[admin] cleared dues %s for student %s", cleared, student_id)
+    return _JSONResponse({
+        "status": "cleared",
+        "student": student["name"],
+        "student_id": student["id"],
+        "cleared_departments": cleared,
+        "current_dues": student["dues"],
+        "all_cleared": all(v == 0 for v in student["dues"].values()),
+    })
+
+
+async def _admin_get_dues(request: _StarletteRequest):
+    student_id = str(request.query_params.get("student_id", "")).upper()
+    if not student_id:
+        return _JSONResponse(
+            {"students": {sid: s["dues"] for sid, s in STUDENTS.items()}},
+        )
+    student = STUDENTS.get(student_id)
+    if not student:
+        return _JSONResponse(
+            {"error": f"student {student_id} not found", "valid_ids": list(STUDENTS)},
+            status_code=404,
+        )
+    return _JSONResponse({
+        "student": student["name"],
+        "student_id": student["id"],
+        "dept": student["dept"],
+        "semester": student["semester"],
+        "dues": student["dues"],
+        "all_cleared": all(v == 0 for v in student["dues"].values()),
+    })
+
+
+responses.add_route("/admin/clear-dues", _admin_clear_dues, methods=["POST"])
+responses.add_route("/admin/dues", _admin_get_dues, methods=["GET"])
+
 responses.run()
