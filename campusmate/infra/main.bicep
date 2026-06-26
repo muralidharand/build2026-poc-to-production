@@ -153,6 +153,7 @@ resource aiProject 'Microsoft.MachineLearningServices/workspaces@2024-10-01' = {
 output AZURE_RESOURCE_GROUP string = resourceGroup().name
 output AZURE_LOCATION string = location
 output AZURE_AI_PROJECT_NAME string = aiProject.name
+output AZURE_AI_PROJECT_ID string = aiProject.id
 output AZURE_AI_HUB_NAME string = aiHub.name
 output AZURE_AI_SERVICES_ENDPOINT string = aiServices.properties.endpoint
 output AZURE_CONTAINER_REGISTRY_ENDPOINT string = containerRegistry.properties.loginServer
