@@ -86,24 +86,8 @@ resource openAiAccount 'Microsoft.CognitiveServices/accounts@2024-10-01' = {
   }
 }
 
-// ---------------------------------------------------------------------------
-// gpt-5 model deployment
-// ---------------------------------------------------------------------------
-resource gpt5Deployment 'Microsoft.CognitiveServices/accounts/deployments@2026-05-01' = {
-  name: 'gpt-5'
-  parent: openAiAccount
-  sku: {
-    name: 'GlobalStandard'
-    capacity: 10
-  }
-  properties: {
-    model: {
-      format: 'OpenAI'
-      name: 'gpt-5'
-      version: '2025-08-07'
-    }
-  }
-}
+// NOTE: gpt-5 deployment is created via CLI after provision (see README).
+// az cognitiveservices account deployment create ... --model-name gpt-5
 
 // ---------------------------------------------------------------------------
 // AcrPull for the OpenAI account managed identity
