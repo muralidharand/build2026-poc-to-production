@@ -36,7 +36,7 @@ from azure.identity import DefaultAzureCredential, InteractiveBrowserCredential
 
 FOUNDRY_PROJECT_ENDPOINT = os.getenv(
     "FOUNDRY_PROJECT_ENDPOINT",
-    "https://ai-muralidharand5060ai658317366498.services.ai.azure.com/api/projects/campusmate-kit",
+    "https://ai-campusmate-eastus2.services.ai.azure.com/api/projects/campusmate-kit",
 )
 AGENT_NAME = os.getenv("AGENT_NAME", "nodues-coordinator")
 
