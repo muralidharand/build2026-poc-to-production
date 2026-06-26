@@ -1,23 +1,26 @@
 # CampusMate Helpdesk — pinned dependencies
 # Python 3.12
+#
+# IMPORTANT: Do NOT use agent-framework==1.6.0 here — it pulls
+# agent-framework-core[all] which causes pip ResolutionTooDeep (200k rounds).
+# Install agent-framework-core directly (no extras) instead.
 
-# Agent framework
-agent-framework==1.6.0
+# Agent framework — core + foundry only, no [all] extras
+agent-framework-core==1.6.0
 agent-framework-foundry==1.0.1
 
 # Azure AI Agent Server
-# Note: [tracing] extra does not exist in 2.0.0b3; tracing is opt-in at runtime
 azure-ai-agentserver-core==2.0.0b3
 azure-ai-agentserver-responses==1.0.0b5
 
 # Azure identity & utilities
-azure-identity>=1.19.0
+azure-identity>=1.19.0,<2.0.0
 python-dotenv>=1.0.0
-httpx>=0.27.0
+httpx>=0.27.0,<1.0.0
 
 # MCP
 mcp>=1.24.0
 
-# Tracing (replaces the [tracing] extra)
+# Tracing
 opentelemetry-sdk>=1.20.0
 azure-monitor-opentelemetry>=1.0.0

@@ -1,4 +1,6 @@
 # Dev-only — local debugging with F5 / Agent Inspector
+# agent-dev-cli pins agent-framework-core<1.3.0 so it cannot coexist
+# with the production requirements; install this in a separate venv.
 -r requirements.txt
 debugpy
 agent-dev-cli>=0.0.1b260427
