@@ -70,19 +70,8 @@ resource containerRegistry 'Microsoft.ContainerRegistry/registries@2023-07-01' =
   properties: { adminUserEnabled: true }
 }
 
-// ---------------------------------------------------------------------------
-// AI Search
-// ---------------------------------------------------------------------------
-resource aiSearch 'Microsoft.Search/searchServices@2024-03-01-preview' = {
-  name: '${abbrs.searchSearchServices}${resourceToken}'
-  location: location
-  tags: tags
-  sku: { name: 'basic' }
-  properties: {
-    replicaCount: 1
-    partitionCount: 1
-  }
-}
+// AI Search omitted — not required by campusmate-helpdesk or nodues-coordinator.
+// Add back if MCP Toolbox / grounding search is enabled in a later sprint.
 
 // ---------------------------------------------------------------------------
 // Azure AI Foundry account (CognitiveServices, kind: AIServices)
