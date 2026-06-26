@@ -124,33 +124,20 @@ resource gpt5Deployment 'Microsoft.CognitiveServices/accounts/deployments@2024-1
 }
 
 // ---------------------------------------------------------------------------
-// Azure AI Foundry Project (child of the Foundry account)
-// azd ai agent extension resolves project via:
-//   Microsoft.CognitiveServices/accounts/{account}/projects/{project}
+// NOTE: The Foundry project is created manually via https://ai.azure.com
+// (Bicep-based project creation via CognitiveServices/accounts/projects
+// preview API does not reliably populate the endpoint property).
+// After creating the project in the portal, set these two azd env vars:
+//   azd env set FOUNDRY_PROJECT_ENDPOINT "https://<account>.services.ai.azure.com/api/projects/<project>"
+//   azd env set AZURE_AI_PROJECT_ID "/subscriptions/.../accounts/<account>/projects/<project>"
 // ---------------------------------------------------------------------------
-resource foundryProject 'Microsoft.CognitiveServices/accounts/projects@2025-04-01-preview' = {
-  name: 'campusmate'
-  parent: foundryAccount
-  location: location
-  tags: tags
-  identity: { type: 'SystemAssigned' }
-  properties: {}
-}
 
 // ---------------------------------------------------------------------------
 // Outputs consumed by azd + agent.yaml env injection
-// AZURE_AI_PROJECT_ID must be the full ARM resource ID of the Foundry project
-// under Microsoft.CognitiveServices/accounts/{account}/projects/{project}
 // ---------------------------------------------------------------------------
 output AZURE_RESOURCE_GROUP string = resourceGroup().name
 output AZURE_LOCATION string = location
 output AZURE_AI_FOUNDRY_ACCOUNT_NAME string = foundryAccount.name
-output AZURE_AI_PROJECT_NAME string = foundryProject.name
-output AZURE_AI_PROJECT_ID string = foundryProject.id
 output AZURE_AI_SERVICES_ENDPOINT string = foundryAccount.properties.endpoint
-// FOUNDRY_PROJECT_ENDPOINT is what the azure.ai.agents azd extension requires.
-// The project resource exposes its own endpoint (services.ai.azure.com domain)
-// which is different from the account's cognitiveservices.azure.com endpoint.
-output FOUNDRY_PROJECT_ENDPOINT string = foundryProject.properties.endpoint
 output AZURE_CONTAINER_REGISTRY_ENDPOINT string = containerRegistry.properties.loginServer
 output APPLICATIONINSIGHTS_CONNECTION_STRING string = appInsights.properties.ConnectionString
