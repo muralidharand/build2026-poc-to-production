@@ -20,6 +20,3 @@ mcp>=1.24.0
 # Debugging
 debugpy
 agent-dev-cli>=0.0.1b260427
-
-# Local wheels (included in the Docker build context)
-./wheels/agent_framework_core-*.whl
