@@ -100,7 +100,7 @@ resource gpt5Deployment 'Microsoft.CognitiveServices/accounts/deployments@2024-1
   parent: foundryAccount
   sku: {
     name: 'GlobalStandard'
-    capacity: 50
+    capacity: 10
   }
   properties: {
     model: {
