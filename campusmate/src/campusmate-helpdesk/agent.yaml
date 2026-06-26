@@ -1,0 +1,23 @@
+kind: hosted
+name: campusmate-helpdesk
+description: >
+  CampusMate AI assistant for Kovai Institute of Technology — answers student
+  queries about schedules, library, and faculty via a router/worker architecture.
+
+protocol:
+  type: responses
+  version: "1.0.0"
+
+container:
+  resources:
+    cpu: "1"
+    memory: 2Gi
+
+environment:
+  MODEL_DEPLOYMENT_NAME: gpt-5
+  ENABLE_INSTRUMENTATION: "true"
+  ENABLE_SENSITIVE_DATA: "true"
+  PROCEDURAL_MEMORY_MODE: hybrid
+  # TOOLBOX_ENDPOINT: ""
+  # PROCEDURAL_MEMORY_STORE_NAME: campusmate-procedural
+  # AZURE_AI_PROJECT_ENDPOINT: ""

@@ -1,0 +1,4 @@
+{"input":"When is my next DBMS lab?","expected":"DBMS Lab, 11:00, Lab-3"}
+{"input":"Is Operating System Concepts in the library?","expected":"Yes, 2 copies, shelf CS-14"}
+{"input":"Who teaches DBMS and when are their office hours?","expected":"Dr. Priya M, Fri 3-5 PM, cabin B-3-21"}
+{"input":"Is Introduction to Algorithms available?","expected":"No, 0 copies available"}

@@ -1,0 +1,15 @@
+name: campusmate-helpdesk
+version: "1.0.0"
+description: >
+  KIT campus helpdesk agent — answers schedule, library, and faculty queries
+  using local campus data and MCP Toolbox.
+optimizer:
+  enabled: true
+  eval_file: ../../eval.yaml
+  golden_file: ../../eval/campusmate_golden.jsonl
+model:
+  deployment: gpt-5
+tags:
+  - campusmate
+  - kit
+  - helpdesk

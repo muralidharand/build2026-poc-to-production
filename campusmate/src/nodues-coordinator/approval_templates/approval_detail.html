@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+{% block title %}Approval {{ item.id }} — KIT No-Dues{% endblock %}
+{% block content %}
+<p><a href="/approvals">&larr; Back to all requests</a></p>
+<div class="card">
+  <h2>{{ item.action }}
+    <span class="badge badge-{{ item.status }}">{{ item.status }}</span>
+    {% if item.severity %}<span class="badge badge-critical">{{ item.severity }}</span>{% endif %}
+  </h2>
+  <div class="fact"><span class="fact-label">Approval ID</span><span>{{ item.id }}</span></div>
+  <div class="fact"><span class="fact-label">Action</span><span>{{ item.action }}</span></div>
+  <div class="fact"><span class="fact-label">Student</span>
+    <span>{{ item.student_name }} ({{ item.student_id }})</span></div>
+  <div class="fact"><span class="fact-label">Description</span>
+    <span>{{ item.description }}</span></div>
+  {% if item.context %}
+  <div class="fact"><span class="fact-label">Context</span>
+    <span>{{ item.context }}</span></div>
+  {% endif %}
+  <div class="fact"><span class="fact-label">Status</span>
+    <span>{{ item.status }}</span></div>
+  <div class="fact"><span class="fact-label">Raised</span>
+    <span>{{ item.created_at }}</span></div>
+  {% if item.decided_at %}
+  <div class="fact"><span class="fact-label">Decided</span>
+    <span>{{ item.decided_at }}</span></div>
+  {% endif %}
+  {% if item.status == "pending" %}
+  <div class="actions">
+    <form method="post" action="/approvals/{{ item.id }}/approve">
+      <button class="btn btn-approve" type="submit">Approve</button>
+    </form>
+    <form method="post" action="/approvals/{{ item.id }}/reject">
+      <button class="btn btn-reject" type="submit">Reject</button>
+    </form>
+  </div>
+  {% endif %}
+</div>
+{% endblock %}

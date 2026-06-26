@@ -1,0 +1,8 @@
+name: campusmate-helpdesk-eval
+description: Evaluation config for CampusMate helpdesk agent
+agent_config: .agent_configs/baseline
+golden_file: eval/campusmate_golden.jsonl
+evaluators:
+  - path: evaluators/campusmate-helpdesk/rubric_dimensions.json
+metrics:
+  pass_threshold: 0.80

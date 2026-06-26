@@ -1,0 +1,17 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Attach to CampusMate Helpdesk (debugpy)",
+      "type": "debugpy",
+      "request": "attach",
+      "connect": {
+        "host": "127.0.0.1",
+        "port": 5679
+      },
+      "justMyCode": false,
+      "preLaunchTask": "Open Agent Inspector",
+      "postDebugTask": "Terminate All Tasks"
+    }
+  ]
+}

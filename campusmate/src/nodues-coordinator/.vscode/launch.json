@@ -1,0 +1,17 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Attach to No-Dues Coordinator (debugpy)",
+      "type": "debugpy",
+      "request": "attach",
+      "connect": {
+        "host": "127.0.0.1",
+        "port": 5680
+      },
+      "justMyCode": false,
+      "preLaunchTask": "Open Agent Inspector",
+      "postDebugTask": "Terminate All Tasks"
+    }
+  ]
+}

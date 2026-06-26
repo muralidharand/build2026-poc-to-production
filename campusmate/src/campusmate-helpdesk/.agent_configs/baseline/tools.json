@@ -1,0 +1,57 @@
+[
+  {
+    "name": "get_class_schedule",
+    "description": "Look up the class and lab schedule for a department on a given weekday.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "dept": {
+          "type": "string",
+          "description": "Department code, e.g. CSE, ECE, MECH."
+        },
+        "day": {
+          "type": "string",
+          "description": "Day of the week in lowercase, e.g. monday, tuesday."
+        }
+      },
+      "required": ["dept", "day"]
+    }
+  },
+  {
+    "name": "search_library_book",
+    "description": "Check whether a library book is available and where to find it.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "title": {
+          "type": "string",
+          "description": "Full or partial book title."
+        }
+      },
+      "required": ["title"]
+    }
+  },
+  {
+    "name": "find_faculty",
+    "description": "Find the faculty member for a subject, with cabin and office hours.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "subject": {
+          "type": "string",
+          "description": "Subject name, e.g. 'Data Structures', 'DBMS'."
+        }
+      },
+      "required": ["subject"]
+    }
+  },
+  {
+    "name": "recall_learned_procedures",
+    "description": "Return all learned procedural guidelines stored in memory. Call when asked 'what have you learned?' or to check for standing guidelines.",
+    "parameters": {
+      "type": "object",
+      "properties": {},
+      "required": []
+    }
+  }
+]

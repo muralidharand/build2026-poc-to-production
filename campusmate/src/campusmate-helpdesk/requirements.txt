@@ -1,0 +1,25 @@
+# CampusMate Helpdesk — pinned dependencies
+# Python 3.12
+
+# Agent framework
+agent-framework==1.6.0
+agent-framework-foundry==1.0.1
+
+# Azure AI Agent Server
+azure-ai-agentserver-core[tracing]==2.0.0b3
+azure-ai-agentserver-responses==1.0.0b5
+
+# Azure identity & utilities
+azure-identity>=1.19.0
+python-dotenv>=1.0.0
+httpx>=0.27.0
+
+# MCP
+mcp>=1.24.0
+
+# Debugging
+debugpy
+agent-dev-cli>=0.0.1b260427
+
+# Local wheels (included in the Docker build context)
+./wheels/agent_framework_core-*.whl

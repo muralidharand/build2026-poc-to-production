@@ -1,0 +1,57 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "Run Agent/Workflow HTTP Server",
+      "type": "shell",
+      "command": "python -m debugpy --listen 127.0.0.1:5680 -m agentdev run main.py --verbose --port 8089",
+      "isBackground": true,
+      "problemMatcher": {
+        "pattern": {
+          "regexp": "^$"
+        },
+        "background": {
+          "activeOnStart": true,
+          "beginsPattern": "Starting",
+          "endsPattern": "Uvicorn running"
+        }
+      },
+      "dependsOn": ["Check port 8089", "Check debugpy port 5680"]
+    },
+    {
+      "label": "Check port 8089",
+      "type": "shell",
+      "command": "bash -c 'if lsof -i :8089 > /dev/null 2>&1; then echo \"Port 8089 is in use — kill the existing process first.\"; exit 1; fi'",
+      "presentation": { "reveal": "silent" }
+    },
+    {
+      "label": "Check debugpy port 5680",
+      "type": "shell",
+      "command": "bash -c 'if lsof -i :5680 > /dev/null 2>&1; then echo \"Port 5680 is in use — kill the existing process first.\"; exit 1; fi'",
+      "presentation": { "reveal": "silent" }
+    },
+    {
+      "label": "Open Agent Inspector",
+      "type": "vscode",
+      "command": "azure-ai-toolkit.openTestTool",
+      "args": {
+        "port": 8089
+      },
+      "dependsOn": ["Run Agent/Workflow HTTP Server"]
+    },
+    {
+      "label": "Terminate All Tasks",
+      "command": "echo ${input:terminate}",
+      "type": "shell",
+      "problemMatcher": []
+    }
+  ],
+  "inputs": [
+    {
+      "id": "terminate",
+      "type": "command",
+      "command": "workbench.action.tasks.terminate",
+      "args": "all"
+    }
+  ]
+}

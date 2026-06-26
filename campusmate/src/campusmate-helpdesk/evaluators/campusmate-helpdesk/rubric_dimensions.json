@@ -1,0 +1,22 @@
+[
+  {
+    "name": "factual_accuracy",
+    "description": "The response contains the correct factual information (e.g. correct room, time, author, copies).",
+    "weight": 0.50
+  },
+  {
+    "name": "tool_usage",
+    "description": "The agent called the appropriate tool(s) rather than answering from parametric memory.",
+    "weight": 0.25
+  },
+  {
+    "name": "helpfulness",
+    "description": "The response is actionable and gives the student what they need to proceed.",
+    "weight": 0.15
+  },
+  {
+    "name": "conciseness",
+    "description": "The response is brief and to the point without unnecessary filler.",
+    "weight": 0.10
+  }
+]

@@ -1,0 +1,9 @@
+name: campusmate-helpdesk
+resources:
+  models:
+    - name: gpt-5
+      format: OpenAI
+      version: "2025-08-07"
+      sku:
+        name: GlobalStandard
+        capacity: 50

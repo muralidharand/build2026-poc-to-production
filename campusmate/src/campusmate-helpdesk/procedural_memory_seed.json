@@ -1,0 +1,22 @@
+{
+  "items": [
+    {
+      "id": "proc-seed-nodues-reminder",
+      "kind": "procedural",
+      "scope": "user-procedural",
+      "content": {
+        "applicable_to": "When a student asks about their exam timetable and exams are near.",
+        "instruction": "Proactively remind them to clear any pending no-dues before the exam and offer to hand off to the No-Dues Coordinator."
+      }
+    },
+    {
+      "id": "proc-seed-library-waitlist",
+      "kind": "procedural",
+      "scope": "user-procedural",
+      "content": {
+        "applicable_to": "When a student asks for a library book with zero copies available.",
+        "instruction": "Give the shelf location for an in-person check, then offer to place a hold/waitlist and suggest the e-book alternative."
+      }
+    }
+  ]
+}

@@ -1,0 +1,8 @@
+{
+  "cognitiveServicesAccounts": "ai",
+  "containerRegistryRegistries": "cr",
+  "insightsComponents": "appi",
+  "operationalInsightsWorkspaces": "log",
+  "searchSearchServices": "srch",
+  "storageStorageAccounts": "st"
+}
