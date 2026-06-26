@@ -1,0 +1,5 @@
+# Dev-only — local debugging with F5 / Agent Inspector
+# Do NOT include in the Docker image (conflicts with agent-framework 1.6.0)
+-r requirements.txt
+debugpy
+agent-dev-cli>=0.0.1b260427

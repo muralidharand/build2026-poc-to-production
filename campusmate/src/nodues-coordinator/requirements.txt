@@ -6,7 +6,7 @@ agent-framework==1.6.0
 agent-framework-foundry==1.0.1
 
 # Azure AI Agent Server
-azure-ai-agentserver-core[tracing]==2.0.0b3
+azure-ai-agentserver-core==2.0.0b3
 azure-ai-agentserver-responses==1.0.0b5
 
 # Azure identity & utilities
@@ -32,5 +32,7 @@ aiohttp>=3.9.0
 requests>=2.31.0
 
 # Debugging
-debugpy
-agent-dev-cli>=0.0.1b260427
+
+# Tracing (replaces the [tracing] extra)
+opentelemetry-sdk>=1.20.0
+azure-monitor-opentelemetry>=1.0.0
