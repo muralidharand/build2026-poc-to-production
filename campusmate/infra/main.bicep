@@ -89,7 +89,7 @@ resource openAiAccount 'Microsoft.CognitiveServices/accounts@2024-10-01' = {
 // ---------------------------------------------------------------------------
 // gpt-5 model deployment
 // ---------------------------------------------------------------------------
-resource gpt5Deployment 'Microsoft.CognitiveServices/accounts/deployments@2024-10-01' = {
+resource gpt5Deployment 'Microsoft.CognitiveServices/accounts/deployments@2026-05-01' = {
   name: 'gpt-5'
   parent: openAiAccount
   sku: {
