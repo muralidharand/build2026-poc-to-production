@@ -14,7 +14,7 @@ container:
     memory: 2Gi
 
 environment:
-  MODEL_DEPLOYMENT_NAME: gpt-4.1
+  MODEL_DEPLOYMENT_NAME: gpt-4o
   ENABLE_INSTRUMENTATION: "true"
   ENABLE_SENSITIVE_DATA: "true"
   PROCEDURAL_MEMORY_MODE: hybrid
