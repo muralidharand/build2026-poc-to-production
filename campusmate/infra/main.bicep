@@ -1,6 +1,9 @@
 // CampusMate — Azure infrastructure
-// Deploys: AI Foundry account + project, gpt-5 model, ACR, App Insights,
-// Log Analytics, AI Search, Storage, capability host, connections.
+// Uses the NEW Azure AI Foundry resource model (2025):
+//   Microsoft.CognitiveServices/accounts  (kind: AIServices)  — the Foundry account
+//   Microsoft.CognitiveServices/accounts/projects             — project under it
+//   Microsoft.CognitiveServices/accounts/deployments          — gpt-5 model deployment
+// azd ai agent extension resolves AZURE_AI_PROJECT_ID as a CognitiveServices path.
 
 targetScope = 'resourceGroup'
 
@@ -82,9 +85,11 @@ resource aiSearch 'Microsoft.Search/searchServices@2024-03-01-preview' = {
 }
 
 // ---------------------------------------------------------------------------
-// Azure AI Services (CognitiveServices) — hosts gpt-5 deployments
+// Azure AI Foundry account (CognitiveServices, kind: AIServices)
+// This is the NEW Foundry resource model (2025). The account hosts both
+// model deployments and child projects.
 // ---------------------------------------------------------------------------
-resource aiServices 'Microsoft.CognitiveServices/accounts@2024-10-01' = {
+resource foundryAccount 'Microsoft.CognitiveServices/accounts@2025-04-01-preview' = {
   name: '${abbrs.cognitiveServicesAccounts}${resourceToken}'
   location: location
   tags: tags
@@ -99,11 +104,11 @@ resource aiServices 'Microsoft.CognitiveServices/accounts@2024-10-01' = {
 }
 
 // ---------------------------------------------------------------------------
-// gpt-5 model deployment (under AI Services account)
+// gpt-5 model deployment (child of the Foundry account)
 // ---------------------------------------------------------------------------
 resource gpt5Deployment 'Microsoft.CognitiveServices/accounts/deployments@2024-10-01' = {
   name: 'gpt-5'
-  parent: aiServices
+  parent: foundryAccount
   sku: {
     name: 'GlobalStandard'
     capacity: 50
@@ -118,43 +123,29 @@ resource gpt5Deployment 'Microsoft.CognitiveServices/accounts/deployments@2024-1
 }
 
 // ---------------------------------------------------------------------------
-// Azure AI Foundry Hub (links to AI Services, Storage, ACR, App Insights)
+// Azure AI Foundry Project (child of the Foundry account)
+// azd ai agent extension resolves project via:
+//   Microsoft.CognitiveServices/accounts/{account}/projects/{project}
 // ---------------------------------------------------------------------------
-resource aiHub 'Microsoft.MachineLearningServices/workspaces@2024-10-01' = {
-  name: '${abbrs.machineLearningWorkspaces}${resourceToken}'
+resource foundryProject 'Microsoft.CognitiveServices/accounts/projects@2025-04-01-preview' = {
+  name: 'campusmate'
+  parent: foundryAccount
   location: location
   tags: tags
-  kind: 'Hub'
   identity: { type: 'SystemAssigned' }
-  properties: {
-    storageAccount: storageAccount.id
-    applicationInsights: appInsights.id
-    containerRegistry: containerRegistry.id
-  }
-}
-
-// ---------------------------------------------------------------------------
-// Azure AI Foundry Project
-// ---------------------------------------------------------------------------
-resource aiProject 'Microsoft.MachineLearningServices/workspaces@2024-10-01' = {
-  name: '${abbrs.machineLearningWorkspaces}proj-${resourceToken}'
-  location: location
-  tags: tags
-  kind: 'Project'
-  identity: { type: 'SystemAssigned' }
-  properties: {
-    hubResourceId: aiHub.id
-  }
+  properties: {}
 }
 
 // ---------------------------------------------------------------------------
 // Outputs consumed by azd + agent.yaml env injection
+// AZURE_AI_PROJECT_ID must be the full ARM resource ID of the Foundry project
+// under Microsoft.CognitiveServices/accounts/{account}/projects/{project}
 // ---------------------------------------------------------------------------
 output AZURE_RESOURCE_GROUP string = resourceGroup().name
 output AZURE_LOCATION string = location
-output AZURE_AI_PROJECT_NAME string = aiProject.name
-output AZURE_AI_PROJECT_ID string = aiProject.id
-output AZURE_AI_HUB_NAME string = aiHub.name
-output AZURE_AI_SERVICES_ENDPOINT string = aiServices.properties.endpoint
+output AZURE_AI_FOUNDRY_ACCOUNT_NAME string = foundryAccount.name
+output AZURE_AI_PROJECT_NAME string = foundryProject.name
+output AZURE_AI_PROJECT_ID string = foundryProject.id
+output AZURE_AI_SERVICES_ENDPOINT string = foundryAccount.properties.endpoint
 output AZURE_CONTAINER_REGISTRY_ENDPOINT string = containerRegistry.properties.loginServer
 output APPLICATIONINSIGHTS_CONNECTION_STRING string = appInsights.properties.ConnectionString
