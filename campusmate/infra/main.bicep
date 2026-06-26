@@ -113,6 +113,22 @@ resource gpt5Deployment 'Microsoft.CognitiveServices/accounts/deployments@2024-1
 }
 
 // ---------------------------------------------------------------------------
+// AcrPull role for the Foundry account managed identity
+// Required for hosted agents to pull images from the Container Registry.
+// ---------------------------------------------------------------------------
+var acrPullRoleId = '7f951dda-4ed3-4680-a7ca-43fe172d538d'
+
+resource acrPullAssignment 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
+  name: guid(containerRegistry.id, foundryAccount.id, acrPullRoleId)
+  scope: containerRegistry
+  properties: {
+    roleDefinitionId: subscriptionResourceId('Microsoft.Authorization/roleDefinitions', acrPullRoleId)
+    principalId: foundryAccount.identity.principalId
+    principalType: 'ServicePrincipal'
+  }
+}
+
+// ---------------------------------------------------------------------------
 // NOTE: The Foundry project is created manually via https://ai.azure.com
 // (Bicep-based project creation via CognitiveServices/accounts/projects
 // preview API does not reliably populate the endpoint property).
