@@ -1,24 +1,27 @@
-// CampusMate — Azure infrastructure
-// Uses the NEW Azure AI Foundry resource model (2025):
-//   Microsoft.CognitiveServices/accounts  (kind: AIServices)  — the Foundry account
-//   Microsoft.CognitiveServices/accounts/projects             — project under it
-//   Microsoft.CognitiveServices/accounts/deployments          — gpt-5 model deployment
-// azd ai agent extension resolves AZURE_AI_PROJECT_ID as a CognitiveServices path.
+// CampusMate — Azure AI Foundry infrastructure
+// Scope: resource group
+// Provisions: Foundry account + project, gpt-5 deployment, ACR (with project
+// connection + AcrPull role), Storage, App Insights, Log Analytics.
+// AI Search omitted (unused by either agent; add back if MCP Toolbox grounding needed).
 
 targetScope = 'resourceGroup'
 
-@description('The environment name (e.g. dev, prod).')
+@description('Environment name (used for tagging and unique token).')
 param environmentName string
 
-@description('Azure region for all resources.')
+@description('Azure region. Must support Foundry Hosted Agents (eastus2 recommended).')
 param location string = resourceGroup().location
+
+@description('Name of the Foundry project to create.')
+param projectName string = 'campusmate'
 
 // ---------------------------------------------------------------------------
 // Variables
 // ---------------------------------------------------------------------------
-var abbrs = loadJsonContent('./abbreviations.json')
+var abbrs         = loadJsonContent('./abbreviations.json')
 var resourceToken = toLower(uniqueString(subscription().id, environmentName, location))
-var tags = { 'azd-env-name': environmentName }
+var tags          = { 'azd-env-name': environmentName }
+var acrPullRoleId = '7f951dda-4ed3-4680-a7ca-43fe172d538d'
 
 // ---------------------------------------------------------------------------
 // Log Analytics + App Insights
@@ -70,13 +73,9 @@ resource containerRegistry 'Microsoft.ContainerRegistry/registries@2023-07-01' =
   properties: { adminUserEnabled: true }
 }
 
-// AI Search omitted — not required by campusmate-helpdesk or nodues-coordinator.
-// Add back if MCP Toolbox / grounding search is enabled in a later sprint.
-
 // ---------------------------------------------------------------------------
-// Azure AI Foundry account (CognitiveServices, kind: AIServices)
-// This is the NEW Foundry resource model (2025). The account hosts both
-// model deployments and child projects.
+// Azure AI Foundry account (CognitiveServices AIServices)
+// allowProjectManagement: true is required to create child projects.
 // ---------------------------------------------------------------------------
 resource foundryAccount 'Microsoft.CognitiveServices/accounts@2025-04-01-preview' = {
   name: '${abbrs.cognitiveServicesAccounts}${resourceToken}'
@@ -113,12 +112,40 @@ resource gpt5Deployment 'Microsoft.CognitiveServices/accounts/deployments@2024-1
 }
 
 // ---------------------------------------------------------------------------
-// AcrPull role for the Foundry account managed identity
-// Required for hosted agents to pull images from the Container Registry.
+// Foundry Project (child of the Foundry account)
+// SystemAssigned identity is required — its principalId is used for AcrPull.
 // ---------------------------------------------------------------------------
-var acrPullRoleId = '7f951dda-4ed3-4680-a7ca-43fe172d538d'
+resource foundryProject 'Microsoft.CognitiveServices/accounts/projects@2025-04-01-preview' = {
+  name: projectName
+  parent: foundryAccount
+  location: location
+  tags: tags
+  identity: { type: 'SystemAssigned' }
+  properties: {}
+  dependsOn: [ gpt5Deployment ]
+}
 
-resource acrPullAssignment 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
+// ---------------------------------------------------------------------------
+// ACR → Project connection
+// Registers the Container Registry with the Foundry project so the hosted
+// agent infrastructure knows which registry to pull images from.
+// ---------------------------------------------------------------------------
+resource projectAcrConnection 'Microsoft.CognitiveServices/accounts/projects/connections@2025-04-01-preview' = {
+  name: 'acr-connection'
+  parent: foundryProject
+  properties: {
+    category: 'ContainerRegistry'
+    target: 'https://${containerRegistry.properties.loginServer}'
+    authType: 'ManagedIdentity'
+    isSharedToAll: true
+    metadata: {}
+  }
+}
+
+// ---------------------------------------------------------------------------
+// AcrPull role for the Foundry ACCOUNT identity (account-level pulls)
+// ---------------------------------------------------------------------------
+resource acrPullForAccount 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
   name: guid(containerRegistry.id, foundryAccount.id, acrPullRoleId)
   scope: containerRegistry
   properties: {
@@ -129,20 +156,29 @@ resource acrPullAssignment 'Microsoft.Authorization/roleAssignments@2022-04-01' 
 }
 
 // ---------------------------------------------------------------------------
-// NOTE: The Foundry project is created manually via https://ai.azure.com
-// (Bicep-based project creation via CognitiveServices/accounts/projects
-// preview API does not reliably populate the endpoint property).
-// After creating the project in the portal, set these two azd env vars:
-//   azd env set FOUNDRY_PROJECT_ENDPOINT "https://<account>.services.ai.azure.com/api/projects/<project>"
-//   azd env set AZURE_AI_PROJECT_ID "/subscriptions/.../accounts/<account>/projects/<project>"
+// AcrPull role for the Foundry PROJECT identity (hosted agent image pulls)
 // ---------------------------------------------------------------------------
+resource acrPullForProject 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
+  name: guid(containerRegistry.id, foundryProject.id, acrPullRoleId)
+  scope: containerRegistry
+  properties: {
+    roleDefinitionId: subscriptionResourceId('Microsoft.Authorization/roleDefinitions', acrPullRoleId)
+    principalId: foundryProject.identity.principalId
+    principalType: 'ServicePrincipal'
+  }
+}
 
 // ---------------------------------------------------------------------------
-// Outputs consumed by azd + agent.yaml env injection
+// Outputs
+// FOUNDRY_PROJECT_ENDPOINT: format the azd ai.agents extension expects.
+// Project endpoint is always: https://<account>.services.ai.azure.com/api/projects/<project>
 // ---------------------------------------------------------------------------
 output AZURE_RESOURCE_GROUP string = resourceGroup().name
 output AZURE_LOCATION string = location
 output AZURE_AI_FOUNDRY_ACCOUNT_NAME string = foundryAccount.name
+output AZURE_AI_PROJECT_NAME string = foundryProject.name
+output AZURE_AI_PROJECT_ID string = foundryProject.id
+output FOUNDRY_PROJECT_ENDPOINT string = 'https://${foundryAccount.name}.services.ai.azure.com/api/projects/${foundryProject.name}'
 output AZURE_AI_SERVICES_ENDPOINT string = foundryAccount.properties.endpoint
 output AZURE_CONTAINER_REGISTRY_ENDPOINT string = containerRegistry.properties.loginServer
 output APPLICATIONINSIGHTS_CONNECTION_STRING string = appInsights.properties.ConnectionString
