@@ -76,7 +76,7 @@ resource openAiAccount 'Microsoft.CognitiveServices/accounts@2024-10-01' = {
   name: '${abbrs.cognitiveServicesAccounts}${resourceToken}'
   location: location
   tags: tags
-  kind: 'OpenAI'
+  kind: 'AIServices'
   identity: { type: 'SystemAssigned' }
   sku: { name: 'S0' }
   properties: {
