@@ -100,6 +100,7 @@ resource foundryAccount 'Microsoft.CognitiveServices/accounts@2025-04-01-preview
     customSubDomainName: '${abbrs.cognitiveServicesAccounts}${resourceToken}'
     publicNetworkAccess: 'Enabled'
     disableLocalAuth: false
+    allowProjectManagement: true
   }
 }
 
