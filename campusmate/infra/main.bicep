@@ -136,7 +136,7 @@ resource projectAcrConnection 'Microsoft.CognitiveServices/accounts/projects/con
   properties: {
     category: 'ContainerRegistry'
     target: 'https://${containerRegistry.properties.loginServer}'
-    authType: 'ManagedIdentity'
+    authType: 'None'
     isSharedToAll: true
     metadata: {}
   }
