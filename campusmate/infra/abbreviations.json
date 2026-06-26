@@ -4,5 +4,6 @@
   "insightsComponents": "appi",
   "operationalInsightsWorkspaces": "log",
   "searchSearchServices": "srch",
-  "storageStorageAccounts": "st"
+  "storageStorageAccounts": "st",
+  "machineLearningWorkspaces": "mlw"
 }

@@ -1,6 +1,6 @@
 // CampusMate — Azure infrastructure
 // Deploys: AI Foundry account + project, gpt-5 model, ACR, App Insights,
-// Log Analytics, AI Search, Bing grounding, Storage, capability host, connections.
+// Log Analytics, AI Search, Storage, capability host, connections.
 
 targetScope = 'resourceGroup'
 
@@ -9,9 +9,6 @@ param environmentName string
 
 @description('Azure region for all resources.')
 param location string = resourceGroup().location
-
-@description('The principal ID of the user/service principal running azd up.')
-param principalId string = ''
 
 // ---------------------------------------------------------------------------
 // Variables
@@ -85,38 +82,28 @@ resource aiSearch 'Microsoft.Search/searchServices@2024-03-01-preview' = {
 }
 
 // ---------------------------------------------------------------------------
-// Azure AI Foundry account + project
+// Azure AI Services (CognitiveServices) — hosts gpt-5 deployments
 // ---------------------------------------------------------------------------
-resource aiAccount 'Microsoft.MachineLearningServices/workspaces@2024-10-01' = {
+resource aiServices 'Microsoft.CognitiveServices/accounts@2024-10-01' = {
   name: '${abbrs.cognitiveServicesAccounts}${resourceToken}'
   location: location
   tags: tags
-  kind: 'Hub'
+  kind: 'AIServices'
   identity: { type: 'SystemAssigned' }
+  sku: { name: 'S0' }
   properties: {
-    storageAccount: storageAccount.id
-    applicationInsights: appInsights.id
-    containerRegistry: containerRegistry.id
-  }
-}
-
-resource aiProject 'Microsoft.MachineLearningServices/workspaces@2024-10-01' = {
-  name: '${abbrs.cognitiveServicesAccounts}proj-${resourceToken}'
-  location: location
-  tags: tags
-  kind: 'Project'
-  identity: { type: 'SystemAssigned' }
-  properties: {
-    hubResourceId: aiAccount.id
+    customSubDomainName: '${abbrs.cognitiveServicesAccounts}${resourceToken}'
+    publicNetworkAccess: 'Enabled'
+    disableLocalAuth: false
   }
 }
 
 // ---------------------------------------------------------------------------
-// gpt-5 model deployment
+// gpt-5 model deployment (under AI Services account)
 // ---------------------------------------------------------------------------
 resource gpt5Deployment 'Microsoft.CognitiveServices/accounts/deployments@2024-10-01' = {
   name: 'gpt-5'
-  parent: any(aiAccount)
+  parent: aiServices
   sku: {
     name: 'GlobalStandard'
     capacity: 50
@@ -131,11 +118,42 @@ resource gpt5Deployment 'Microsoft.CognitiveServices/accounts/deployments@2024-1
 }
 
 // ---------------------------------------------------------------------------
-// Outputs
+// Azure AI Foundry Hub (links to AI Services, Storage, ACR, App Insights)
+// ---------------------------------------------------------------------------
+resource aiHub 'Microsoft.MachineLearningServices/workspaces@2024-10-01' = {
+  name: '${abbrs.machineLearningWorkspaces}${resourceToken}'
+  location: location
+  tags: tags
+  kind: 'Hub'
+  identity: { type: 'SystemAssigned' }
+  properties: {
+    storageAccount: storageAccount.id
+    applicationInsights: appInsights.id
+    containerRegistry: containerRegistry.id
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Azure AI Foundry Project
+// ---------------------------------------------------------------------------
+resource aiProject 'Microsoft.MachineLearningServices/workspaces@2024-10-01' = {
+  name: '${abbrs.machineLearningWorkspaces}proj-${resourceToken}'
+  location: location
+  tags: tags
+  kind: 'Project'
+  identity: { type: 'SystemAssigned' }
+  properties: {
+    hubResourceId: aiHub.id
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Outputs consumed by azd + agent.yaml env injection
 // ---------------------------------------------------------------------------
 output AZURE_RESOURCE_GROUP string = resourceGroup().name
 output AZURE_LOCATION string = location
 output AZURE_AI_PROJECT_NAME string = aiProject.name
-output AZURE_AI_HUB_NAME string = aiAccount.name
+output AZURE_AI_HUB_NAME string = aiHub.name
+output AZURE_AI_SERVICES_ENDPOINT string = aiServices.properties.endpoint
 output AZURE_CONTAINER_REGISTRY_ENDPOINT string = containerRegistry.properties.loginServer
 output APPLICATIONINSIGHTS_CONNECTION_STRING string = appInsights.properties.ConnectionString
