@@ -101,6 +101,8 @@ def clear_dues(token: str, student_id: str, department: str = "", clear_all: boo
 # ── CLI ────────────────────────────────────────────────────────────────────────
 
 def main():
+    global FOUNDRY_PROJECT_ENDPOINT
+
     parser = argparse.ArgumentParser(description="CampusMate NoDues demo helper")
     parser.add_argument("--student", help="Student ID (e.g. 22CSE114)")
     parser.add_argument("--dept", help="Department to clear (library|lab|hostel|fees)")
@@ -113,7 +115,6 @@ def main():
     )
     args = parser.parse_args()
 
-    global FOUNDRY_PROJECT_ENDPOINT
     FOUNDRY_PROJECT_ENDPOINT = args.endpoint
 
     print(f"Agent: {_agent_url('...')}")
