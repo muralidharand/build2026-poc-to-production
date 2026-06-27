@@ -24,8 +24,7 @@ environment_variables:
   - name: ENABLE_SENSITIVE_DATA
     value: "true"
 
-  # ── Optional integrations (left unset → the agent uses built-in sample data) ──
-  # Foundry Toolbox: a single MCP endpoint that can supply AI Search, Web Search,
-  # and Code Interpreter. Set to your project's toolbox MCP URL to enable.
-  # - name: TOOLBOX_ENDPOINT
-  #   value: https://<account>.services.ai.azure.com/api/projects/<project>/toolboxes/<toolbox>/mcp?api-version=v1
+  # ── Optional integrations ──
+  # Foundry Toolbox: a single MCP endpoint that supplies Web Search and other tools.
+  - name: TOOLBOX_ENDPOINT
+    value: https://ai-campusmate-v1-eastus2.services.ai.azure.com/api/projects/campusmate-v1-kit/toolboxes/website-details/mcp?api-version=v1
